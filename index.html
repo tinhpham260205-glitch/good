@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thiệp 20/10 – Card Layout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --pink:#ff6b86; --pink2:#ff99ad; --bg:#2a2230; --paper:#fff7fb; --ink:#3b2d33; --dot:#f1cfd9;
+      --border:#f0b4c2; --card-shadow:0 28px 50px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:#423240 radial-gradient(1200px 700px at 50% -10%, #6b4b5a 0%, #3b2b36 38%, #2a2230 100%); color:var(--ink); font-family:Poppins,system-ui; display:grid; place-items:center; overflow:hidden}
+
+    /* star dots */
+    .dots{position:fixed; inset:0; pointer-events:none; z-index:999}
+    .dots i{position:absolute; width:4px; height:4px; background:#ffdbe4; border-radius:50%; opacity:.6}
+    
+    /* falling hearts */
+    .falling-heart{
+      position:absolute;
+      width:20px;
+      height:20px;
+      background:radial-gradient(circle at 30% 30%, #fff 6%, var(--pink2) 32%, var(--pink) 72%);
+      transform:rotate(45deg);
+      border-radius:50% 0 50% 50%;
+      opacity:0;
+      filter:drop-shadow(0 4px 8px rgba(255,107,134,.3));
+      animation:fall linear forwards;
+      pointer-events:none;
+    }
+    @keyframes fall{
+      0%{top:-30px; opacity:0; transform:rotate(45deg) scale(0.6)}
+      10%{opacity:1}
+      90%{opacity:0.8}
+      100%{top:110vh; opacity:0; transform:rotate(405deg) scale(1.2)}
+    }
+
+    .stage{position:relative; width:min(980px,96vw); aspect-ratio:16/9; display:grid; place-items:center}
+
+    /* circular header text */
+    .ring{position:absolute; width:min(680px,90%); aspect-ratio:1; opacity:.26;}
+    .ring svg{width:100%; height:100%}
+    .ring text{font-weight:700; letter-spacing:1.5px; fill:#ffd0db}
+
+    /* stack cards */
+    .stack{position:relative; width:min(720px,92%);}
+    .stack::before, .stack::after{
+      content:""; position:absolute; inset:0; border-radius:24px; background:linear-gradient(180deg,#fff,#fff3f7); box-shadow:var(--card-shadow); transform-origin:center; z-index:0
+    }
+    .stack::before{transform:rotate(-8deg) translateY(18px); opacity:.9}
+    .stack::after{transform:rotate(6deg) translateY(8px); filter:saturate(.96); opacity:.9}
+
+    .card{position:relative; z-index:1; border-radius:24px; background:linear-gradient(180deg,#fff,#fff6f9); box-shadow:var(--card-shadow); padding:42px 46px; overflow:hidden}
+
+    /* dotted inner border */
+    .card .border{position:absolute; inset:18px; border-radius:20px; border:2px dashed var(--border); pointer-events:none}
+    .corner{position:absolute; width:18px; height:18px; filter:drop-shadow(0 6px 8px rgba(255,107,134,.25))}
+    .corner.heart{background:radial-gradient(circle at 30% 30%,#fff 4%, var(--pink2) 30%, var(--pink) 70%); transform:rotate(45deg); border-radius:4px}
+    .corner.tl{left:22px; top:22px}
+    .corner.tr{right:22px; top:22px}
+    .corner.bl{left:22px; bottom:22px}
+    .corner.br{right:22px; bottom:22px}
+
+    .grid{display:grid; grid-template-columns:140px 1fr; gap:24px; align-items:center}
+
+    /* illustration */
+    .balloon{
+      position:relative; 
+      width:120px; 
+      justify-self:center;
+      animation:floatBalloon 4s ease-in-out infinite;
+    }
+    @keyframes floatBalloon{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
+    }
+    .balloon svg{
+      width:120px; 
+      height:120px; 
+      display:block;
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:1;
+    }
+    /* Photo inside balloon */
+    .balloon-photo{
+      position:absolute;
+      top:12px;
+      left:50%;
+      transform:translateX(-50%);
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      overflow:hidden;
+      border:3px solid rgba(255,255,255,0.9);
+      box-shadow:0 6px 16px rgba(0,0,0,.18);
+      z-index:2;
+    }
+    .balloon-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .gift{
+      position:absolute; 
+      left:16px; 
+      bottom:-6px; 
+      width:70px; 
+      height:54px; 
+      background:#fff; 
+      border-radius:10px; 
+      box-shadow:0 12px 22px rgba(0,0,0,.1);
+      animation:giftPulse 3s ease-in-out infinite;
+    }
+    @keyframes giftPulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.05)}
+    }
+    .gift::before{content:""; position:absolute; inset:0; border-radius:10px; border:3px solid var(--pink)}
+    .gift::after{content:"🎀"; position:absolute; left:50%; top:-20px; translate:-50% 0; font-size:22px}
+
+    .title{
+      font-family:"Dancing Script"; 
+      font-size:38px; 
+      color:#2b1e23; 
+      margin:0 0 12px;
+      opacity:0;
+      transform:scale(0.8) translateY(-10px);
+      animation:titleBounce 1s cubic-bezier(.34,1.56,.64,1) forwards;
+      text-shadow:0 2px 12px rgba(255,107,134,0.2);
+    }
+    @keyframes titleBounce{
+      0%{opacity:0; transform:scale(0.8) translateY(-10px)}
+      70%{transform:scale(1.05) translateY(0)}
+      100%{opacity:1; transform:scale(1) translateY(0)}
+    }
+    .content p{margin:0 0 10px; font-size:18px; color:#563b44; line-height:1.7}
+    .content b{
+      color:var(--pink);
+      font-weight:700;
+      display:inline-block;
+      animation:glow 2.5s ease-in-out infinite;
+    }
+    @keyframes glow{
+      0%,100%{text-shadow:0 0 6px rgba(255,107,134,0.3)}
+      50%{text-shadow:0 0 14px rgba(255,107,134,0.7), 0 0 22px rgba(255,107,134,0.4)}
+    }
+
+    /* reveal lines with SINH ĐỘNG animations */
+    .reveal .content p{opacity:0; transform:translateX(-40px) scale(0.95); filter:blur(6px)}
+    .reveal .content p:nth-child(even){transform:translateX(40px) scale(0.95)}
+    .reveal .content p.show{animation:slideInBounce 0.9s cubic-bezier(.34,1.56,.64,1) forwards}
+    @keyframes slideInBounce{
+      0%{opacity:0; transform:translateX(-40px) scale(0.95); filter:blur(6px)}
+      60%{transform:translateX(3px) scale(1.02); filter:blur(0)}
+      100%{opacity:1; transform:translateX(0) scale(1); filter:blur(0)}
+    }
+    .reveal .content p:nth-child(even).show{
+      animation:slideInBounceRight 0.9s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    @keyframes slideInBounceRight{
+      0%{opacity:0; transform:translateX(40px) scale(0.95); filter:blur(6px)}
+      60%{transform:translateX(-3px) scale(1.02); filter:blur(0)}
+      100%{opacity:1; transform:translateX(0) scale(1); filter:blur(0)}
+    }
+
+    .footer{
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      margin-top:8px; 
+      color:#a35262; 
+      font-weight:600;
+      opacity:0;
+      animation:fadeInFooter 0.8s ease forwards 1.2s;
+    }
+    .footer span:last-child{
+      animation:shimmer 3s ease-in-out infinite;
+    }
+    @keyframes fadeInFooter{
+      to{opacity:1}
+    }
+    @keyframes shimmer{
+      0%,100%{color:#a35262; text-shadow:0 0 4px rgba(255,107,134,0.2)}
+      50%{color:#ff6b86; text-shadow:0 0 12px rgba(255,107,134,0.5)}
+    }
+
+    .controls{position:absolute; right:14px; top:14px; display:flex; gap:10px}
+    .btn{appearance:none; border:0; background:#fff; padding:10px 14px; border-radius:12px; box-shadow:0 10px 18px rgba(0,0,0,.12); cursor:pointer; font-weight:600}
+    .btn.primary{background:linear-gradient(180deg,var(--pink2),var(--pink)); color:#fff}
+
+    /* Open button overlay */
+    .open-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(42,34,48,0.96);
+      display:grid;
+      place-items:center;
+      z-index:9999;
+      opacity:1;
+      transition:opacity 0.8s ease, visibility 0.8s ease;
+    }
+    .open-overlay.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+    .open-btn{
+      background:linear-gradient(135deg, var(--pink2), var(--pink));
+      color:#fff;
+      border:none;
+      padding:24px 56px;
+      border-radius:50px;
+      font-size:28px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 20px 50px rgba(255,107,134,.45), 0 0 0 0 rgba(255,107,134,.7);
+      transition:transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
+      animation:pulseButton 2.5s ease-in-out infinite;
+      letter-spacing:1px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border:4px solid rgba(255,255,255,0.3);
+    }
+    .open-btn:hover{
+      transform:translateY(-6px) scale(1.08);
+      box-shadow:0 25px 60px rgba(255,107,134,.6), 0 0 30px rgba(255,107,134,.5);
+    }
+    .open-btn:active{
+      transform:translateY(-3px) scale(1.05);
+    }
+    @keyframes pulseButton{
+      0%,100%{transform:scale(1); box-shadow:0 20px 50px rgba(255,107,134,.45), 0 0 0 0 rgba(255,107,134,.7)}
+      50%{transform:scale(1.08); box-shadow:0 25px 60px rgba(255,107,134,.55), 0 0 40px 10px rgba(255,107,134,0)}
+    }
+
+    /* Card initial hidden state */
+    .stage.hidden{
+      opacity:0;
+      transform:scale(0.8) translateY(30px);
+      pointer-events:none;
+    }
+    .stage.show{
+      animation:revealCard 1s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    @keyframes revealCard{
+      0%{opacity:0; transform:scale(0.8) translateY(30px)}
+      100%{opacity:1; transform:scale(1) translateY(0)}
+    }
+
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr; text-align:center}
+      .title{font-size:34px}
+      .content p{font-size:16px}
+      .open-btn{
+        padding:20px 40px;
+        font-size:24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Open button overlay -->
+  <div class="open-overlay" id="openOverlay">
+    <button class="open-btn" id="openButton">
+      <span>💌</span>
+      <span>Mở thư</span>
+      <span>💌</span>
+    </button>
+  </div>
+
+  <div class="dots" id="dots"></div>
+
+  <div class="stage hidden" id="stage">
+    <!-- curved header text -->
+    <div class="ring" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <path id="circle" d="M50,50 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0" />
+        </defs>
+        <text font-size="5">
+          <textPath xlink:href="#circle"> From With Love 20/10 • Happy Women’s Day • From With Love 20/10 • </textPath>
+        </text>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="play">Play</button>
+      <button class="btn" id="replay">Replay</button>
+    </div>
+
+    <!-- stacked cards -->
+    <div class="stack">
+      <div class="card reveal" id="card">
+        <span class="border"></span>
+        <span class="corner heart tl"></span>
+        <span class="corner heart tr"></span>
+        <span class="corner heart bl"></span>
+        <span class="corner heart br"></span>
+
+        <div class="grid">
+          <!-- illustration -->
+          <div class="balloon">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#ff8aa1"/>
+                  <stop offset="100%" stop-color="#ff5e7e"/>
+                </linearGradient>
+              </defs>
+              <path d="M60 18 C88 18, 100 44, 60 74 C20 44, 32 18, 60 18Z" fill="url(#g)"/>
+              <line x1="60" y1="74" x2="60" y2="106" stroke="#ff6b86" stroke-width="2"/>
+            </svg>
+            <div class="balloon-photo">
+              <img src="ảnh/z7137026031987_4544fcd1d4ac51bf462f9a20d6b00075.jpg" alt="Photo">
+            </div>
+            <div class="gift"></div>
+          </div>
+          
+          <!-- text -->
+          <div class="copy">
+            <h2 class="title">Gửi bé Uyên!</h2>
+            <div class="content" id="content">
+              <p>Hôm nay là ngày <b>20/10</b>, xin gửi lời chúc tới bé Uyên.</p>
+              <p>Chúc em luôn vui vẻ, luôn hạnh phúc và luôn xinh đẹp nhé!</p>
+              <p>Cảm ơn em vì đã đến, anh hi vọng một ngày không xa chúng ta sẽ có cơ hội ở bên nhau. 💖</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>❤️ 20/10</span>
+          <span>From me, with all my love to you</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // tiny star dots
+    (function(){
+      const d = document.getElementById('dots');
+      for(let i=0;i<28;i++){
+        const k = document.createElement('i');
+        const s = 2+Math.random()*3; k.style.width=k.style.height=s+'px';
+        k.style.left = Math.random()*100+'vw';
+        k.style.top = Math.random()*100+'vh';
+        k.style.opacity = .3 + Math.random()*.4;
+        d.appendChild(k);
+      }
+    })();
+
+    // create falling hearts effect - LIÊN TỤC
+    let heartInterval;
+    
+    function createSingleHeart(){
+      const d = document.getElementById('dots');
+      const heart = document.createElement('div');
+      heart.className = 'falling-heart';
+      
+      // random properties
+      const size = 12 + Math.random() * 16;
+      heart.style.width = heart.style.height = size + 'px';
+      heart.style.left = Math.random() * 100 + 'vw';
+      
+      const duration = 4 + Math.random() * 4;
+      heart.style.animationDuration = duration + 's';
+      
+      const delay = Math.random() * 0.5;
+      heart.style.animationDelay = delay + 's';
+      
+      d.appendChild(heart);
+      
+      // remove after animation
+      setTimeout(()=> heart.remove(), (duration + delay) * 1000 + 500);
+    }
+    
+    function createFallingHearts(){
+      // Clear any existing interval
+      if(heartInterval) clearInterval(heartInterval);
+      
+      // Tạo trái tim mới liên tục mỗi 300ms
+      heartInterval = setInterval(createSingleHeart, 300);
+    }
+    
+    function stopFallingHearts(){
+      if(heartInterval){
+        clearInterval(heartInterval);
+        heartInterval = null;
+      }
+    }
+
+    function revealLines(){
+      const ps = [...document.querySelectorAll('#content p')];
+      ps.forEach(p=>p.classList.remove('show'));
+      ps.reduce((acc,p,i)=>{
+        setTimeout(()=>p.classList.add('show'), 300 + i*800); // slower for readability
+        return acc;
+      },0);
+    }
+
+    function play(){
+      revealLines();
+      createFallingHearts(); // trigger hearts when playing
+    }
+
+    // Open button handler
+    const openButton = document.getElementById('openButton');
+    const openOverlay = document.getElementById('openOverlay');
+    const stage = document.getElementById('stage');
+
+    openButton.addEventListener('click', ()=>{
+      // Hide overlay
+      openOverlay.classList.add('hide');
+      
+      // Show card with animation
+      setTimeout(()=>{
+        stage.classList.remove('hidden');
+        stage.classList.add('show');
+        
+        // Start animation after card appears
+        setTimeout(()=>{
+          play();
+        }, 400);
+      }, 200);
+    });
+
+    document.getElementById('play').addEventListener('click', play);
+    document.getElementById('replay').addEventListener('click', play);
+
+    // REMOVE auto play - wait for user to click open button
+    // setTimeout(play, 600);
+  </script>
+</body>
+</html>
